@@ -2,6 +2,7 @@
 
 import sys
 
+
 #a function to clean up a DNA sequence
 def clean_seq(input_seq):
 	clean = input_seq.upper()
@@ -21,11 +22,18 @@ def nuc_freq(sequence, base, sig_digs=2):
 	#return frequency and length 
 	return(length, round(freq_of_base, sig_digs))
 	
+	# key = feature type, value = concatenation of all sequences of that type
+	#not useful for anything other than calculating AT/GC content
+feature_sequences = {}
+
+# key = gene name, value = another dictionary [key = exon number, value = exon sequence]
+# gene_sequences[cox1][1] = 'the sequence for the first exon of cox1'
+# gene_sequences[cox1][2] = 'the sequence for the second exon of cox1'
+gene_sequences = {}
+	
 #for above: sig_digs equal to 2
 #gc content for each category	
 
-#Thoughts: cat both files (or hard code), define both with variable, read separately,
-#count feature types, count Cs and Gs total, break it down by feature type, worry about formatting
 
 #declare fsa file name
 fsa_filename ='watermelon.fsa'
@@ -52,7 +60,6 @@ for line in fsa_infile:
 #print(len(genome))	
 #seems right (same as above)
 
-fsa_infile.close()
 
 #declare gff file name
 gff_filename = 'watermelon.gff'
@@ -80,45 +87,66 @@ for line in gff_infile:
 	stop = int(fields[4])
 	#print(type, start, "\t", stop)
 	
-	fragment = genome[start-1:stop]
+	#get the gene name
+	attributes = fields[8].split(';')
+	print(attributes[0])
 	
+	# get the exon#
+	
+	#print(type, "\t", start, "\t", end)
+	
+	#extract and clean the sequence of this feature from the genome
+	
+	fragment = genome[start-1:stop]
 	fragment = clean_seq(fragment) 
 	#print(clean)
 	#sys.exit()
 	
+	if type in feature_sequences:
+		feature_sequences[type] += fragment
+	else:
+		feature_sequences[type] = fragment
+		
+#close the gff file	
+gff_infile.close()
+
+for feature, sequence in feature_sequences.items():
+	print(feature + "\t" + str(len(sequence)))
+
+
 	#print(fragment)
 	
-	if type == 'CDS':
-		cds += fragment
+	#if type == 'CDS':
+		#cds += fragment
 		#cds equals big concatenated cds, etc
 		
-	if type == 'intron':
-		intron += fragment
+	#if type == 'intron':
+		#intron += fragment
 		
-	if type == 'misc_feature':
-		misc += fragment
+	#if type == 'misc_feature':
+		#misc += fragment
 		
-	if type == 'repeat_region':
-		repeats += fragment
+	#if type == 'repeat_region':
+		#repeats += fragment
 		
-	if type == 'rRNA':
-		rrna += fragment
+	#if type == 'rRNA':
+		#rrna += fragment
 		
-	if type== 'tRNA':
-		trna += fragment
+	#if type== 'tRNA':
+		#trna += fragment
 		
-list_of_features = ['cds', 'intron', 'misc', 'repeats', 'rrna', 'trna']
-feature_sequences = [cds, intron, misc, repeats, rrna, trna]
-bases = ['A','G','T','C']
+#list_of_features = ['cds', 'intron', 'misc', 'repeats', 'rrna', 'trna']
+#feature_sequences = [cds, intron, misc, repeats, rrna, trna]
+#bases = ['A','G','T','C']
 
-for i in range(len(list_of_features)):
-	print(i)
+#for i in range(len(list_of_features)):
+	#print(i)
 	#loop over four nucleotides		
-	for nucleotide in bases:
+	#for nucleotide in bases:
 	
 		#calculate the nucleotide composition for each feature
-		(feature_length, feature_comp) = nuc_freq(feature_sequences[i], base=nucleotide, sig_digs=2)
-		print(list_of_features[i] + "\t" + str(feature_length) + "\t" + str(feature_comp) + str(nucleotide))
+		#(feature_length, feature_comp) = nuc_freq(feature_sequences[i], base=nucleotide, sig_digs=2)
+		#print(list_of_features[i] + "\t" + str(feature_length) + "\t" + str(feature_comp) + str(nucleotide))
 
 ##print out nucleotide frequency
 ##ch08
@@ -127,22 +155,22 @@ for i in range(len(list_of_features)):
 #print(cds.count('G'))
 #print(cds.count('C'))
 
-GC_content_cds = (cds.count('C') + cds.count('G'))
+#GC_content_cds = (cds.count('C') + cds.count('G'))
 #print(GC_content_cds)
 
-GC_content_intron = (cds.count('C') + intron.count('G'))
+#GC_content_intron = (cds.count('C') + intron.count('G'))
 #print(GC_content_intron)
 
-GC_content_misc = (misc.count('C') + misc.count('G'))
+#GC_content_misc = (misc.count('C') + misc.count('G'))
 #print(GC_content_misc)
 
-GC_content_repeats = (repeats.count('C') + repeats.count('G'))
+#GC_content_repeats = (repeats.count('C') + repeats.count('G'))
 #print(GC_content_repeats)
 
-GC_content_rrna = (rrna.count('C') + rrna.count('G'))
+#GC_content_rrna = (rrna.count('C') + rrna.count('G'))
 #print(GC_content_rrna)
 
-GC_content_trna = (trna.count('C') + trna.count('G'))
+#GC_content_trna = (trna.count('C') + trna.count('G'))
 #print(GC_content_trna)
 
 
@@ -158,10 +186,16 @@ GC_content_trna = (trna.count('C') + trna.count('G'))
 
 #"{:%.1f}%.format(GC_content_cds)/(len(genome))")
 
-#edits needed- why is the script repeating?							
+#to organize this genome..
+# dictionaries!
+# genes
+# key = gene name
+# value = [key = exon#, value = seq]
+
+							
 	
 
-gff_infile.close()
+
 	
 		
 		
