@@ -87,25 +87,46 @@ for line in gff_infile:
 	stop = int(fields[4])
 	#print(type, start, "\t", stop)
 	
-	#get the gene name
-	attributes = fields[8].split(';')
-	print(attributes[0])
-	
-	# get the exon#
-	
-	#print(type, "\t", start, "\t", end)
-	
-	#extract and clean the sequence of this feature from the genome
+#extract and clean the sequence of this feature from the genome
 	
 	fragment = genome[start-1:stop]
 	fragment = clean_seq(fragment) 
 	#print(clean)
 	#sys.exit()
 	
+	# determine the strand, reverse complement or not
+	if(fields[6] == '-'):
+		fragment = reverse_complement(fragment)
+	
+	#store the big concatenated thing for calculating GC content
+	
 	if type in feature_sequences:
 		feature_sequences[type] += fragment
 	else:
 		feature_sequences[type] = fragment
+		
+
+
+if(type == 'CDS'):	
+	#get the gene name
+	#print(fields[8])
+	attributes = fields[8].split(';')
+	print(attributes[0])
+	
+	gene_fields = attributes[0].split(' ')
+	gene_name = gene_fields[1]
+	
+	# get the exon#
+	if('exon' in gene_fields ):
+		#print("has exons: " + attributes[0])
+		exon_num = gene_fields[-1]
+		print(gene_name, exon_num)
+	# else:
+		# print("Doesn't have exons: " + attributes[0])
+			
+	
+	#print(type, "\t", start, "\t", end)
+	
 		
 #close the gff file	
 gff_infile.close()
