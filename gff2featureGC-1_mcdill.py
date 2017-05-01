@@ -2,7 +2,6 @@
 
 import sys
 
-
 #a function to clean up a DNA sequence
 def clean_seq(input_seq):
 	clean = input_seq.upper()
@@ -159,7 +158,7 @@ GC_content_trna = (trna.count('C') + trna.count('G'))
 
 #"{:%.1f}%.format(GC_content_cds)/(len(genome))")
 
-							
+#edits needed- why is the script repeating?							
 	
 
 gff_infile.close()
