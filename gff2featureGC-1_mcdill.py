@@ -22,8 +22,8 @@ def nuc_freq(sequence, base, sig_digs=2):
 	#return frequency and length 
 	return(length, round(freq_of_base, sig_digs))
 	
-	# key = feature type, value = concatenation of all sequences of that type
-	#not useful for anything other than calculating AT/GC content
+# key = feature type, value = concatenation of all sequences of that type
+#not useful for anything other than calculating AT/GC content
 feature_sequences = {}
 
 # key = gene name, value = another dictionary [key = exon number, value = exon sequence]
@@ -42,6 +42,7 @@ fsa_infile = open(fsa_filename, 'r')
 #declare variable
 genome = ''
 
+#initialize line counter
 line_number = 0
 
 #read in genome file
@@ -60,17 +61,14 @@ for line in fsa_infile:
 #print(len(genome))	
 #seems right (same as above)
 
+#close genome file
+fsa_infile.close()
+
 
 #declare gff file name
 gff_filename = 'watermelon.gff'
 gff_infile = open(gff_filename, 'r')
 
-cds = ''
-trna = ''
-rrna = ''
-intron = ''
-misc = ''
-repeats = ''
 
 #read in gff file
 for line in gff_infile:
@@ -87,15 +85,14 @@ for line in gff_infile:
 	stop = int(fields[4])
 	#print(type, start, "\t", stop)
 	
-#extract and clean the sequence of this feature from the genome
+	#extract and clean the sequence of this feature from the genome
 	
 	fragment = genome[start-1:stop]
 	fragment = clean_seq(fragment) 
-	#print(clean)
-	#sys.exit()
 	
 	# determine the strand, reverse complement or not
-	if(fields[6] == '-'):
+	if( fields[6] == '-' ):
+		reverse_complement = fragment[start:stop-1]
 		fragment = reverse_complement(fragment)
 	
 	#store the big concatenated thing for calculating GC content
